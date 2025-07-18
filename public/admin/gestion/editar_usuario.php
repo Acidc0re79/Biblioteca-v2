@@ -1,5 +1,5 @@
 <?php
-// Archivo COMPLETO Y FINAL: /public/admin/gestion/editar_usuario.php
+// Archivo COMPLETO Y CORREGIDO: /public/admin/gestion/editar_usuario.php
 
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -32,6 +32,7 @@ $es_admin = $_SESSION['rango'] === 'administrador';
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>const BASE_URL = '<?= BASE_URL ?>';</script>
 
     <style>
@@ -74,7 +75,6 @@ $es_admin = $_SESSION['rango'] === 'administrador';
                 <form class="edit-form" action="<?= BASE_URL ?>form-handler.php" method="POST">
                     <input type="hidden" name="action" value="actualizar_usuario_admin">
                     <input type="hidden" name="id_usuario" value="<?= $usuario['id_usuario'] ?>">
-
                     <?php if ($es_admin): ?>
                     <div class="form-section">
                         <h3><i class="fas fa-fingerprint"></i> Información Personal (Solo Admin)</h3>
@@ -94,7 +94,6 @@ $es_admin = $_SESSION['rango'] === 'administrador';
                         </div>
                     </div>
                     <?php endif; ?>
-
                     <div class="form-section">
                         <h3><i class="fas fa-user-shield"></i> Control de Cuenta</h3>
                         <div class="form-grid">
@@ -123,7 +122,6 @@ $es_admin = $_SESSION['rango'] === 'administrador';
                             </div>
                         </div>
                     </div>
-
                     <div class="form-section">
                         <h3><i class="fas fa-key"></i> Seguridad</h3>
                         <div class="form-group">
@@ -131,7 +129,6 @@ $es_admin = $_SESSION['rango'] === 'administrador';
                             <input type="password" id="password" name="password" autocomplete="new-password">
                         </div>
                     </div>
-
                     <div class="form-section">
                         <h3><i class="fas fa-gamepad"></i> Gamificación y Privilegios</h3>
                         <div class="form-grid">
@@ -162,7 +159,6 @@ $es_admin = $_SESSION['rango'] === 'administrador';
                             </div>
                         </div>
                     </div>
-
                     <div class="form-actions">
                         <button type="submit" class="btn-save">Guardar Cambios</button>
                         <?php if ($es_admin && $_SESSION['user_id'] != $usuario['id_usuario']): ?>
@@ -177,10 +173,12 @@ $es_admin = $_SESSION['rango'] === 'administrador';
     </div>
 
     <?php
+    // Incluimos todos los modales que esta página puede necesitar.
     include __DIR__ . '/../includes/modals/modal_eliminar_usuario.php';
     include __DIR__ . '/../includes/modals/modal_gestionar_insignias.php';
     include_once ROOT_PATH . '/public/includes/modals/modal_view_avatar.php';
     include_once ROOT_PATH . '/public/includes/modals/modal_galeria_avatares.php';
+    include_once ROOT_PATH . '/public/includes/modals/modal_view_insignia.php';
     ?>
 </body>
 </html>

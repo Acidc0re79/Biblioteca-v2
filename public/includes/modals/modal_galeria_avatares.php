@@ -1,3 +1,6 @@
+<?php
+// Archivo COMPLETO Y FINAL: /public/includes/modals/modal_galeria_avatares.php
+?>
 <div id="modal-galeria-avatares" class="modal-galeria">
   <div class="modal-galeria-content">
     <h3 id="galeria-titulo">Mis Creaciones</h3>
@@ -11,37 +14,14 @@
 </div>
 
 <style>
-    .modal-galeria {
-        display: none; /* ✅ La corrección clave: Oculto por defecto */
-        position: fixed; z-index: 1000; left: 0; top: 0;
-        width: 100%; height: 100%; overflow: auto;
-        background-color: rgba(0,0,0,0.7);
-        padding-top: 60px;
-    }
-    .modal-galeria-content {
-        background-color: #2c2c2d; margin: 5% auto; padding: 20px;
-        border: 1px solid #555; width: 90%; max-width: 800px; border-radius: 8px;
-    }
-    .galeria-grid {
-        display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;
-        max-height: 60vh; overflow-y: auto; background: #1e1e1e;
-        padding: 10px; border-radius: 4px; margin-top: 1rem; margin-bottom: 1rem;
-    }
+    .modal-galeria { display: none; position: fixed; z-index: 1050; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); padding-top: 60px; }
+    .modal-galeria-content { background-color: #2c2c2d; color: #e0e0e0; margin: 5% auto; padding: 20px; border: 1px solid #555; width: 90%; max-width: 800px; border-radius: 8px; }
+    .galeria-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; max-height: 60vh; overflow-y: auto; background: #1e1e1e; padding: 10px; border-radius: 4px; margin-top: 1rem; margin-bottom: 1rem; }
     .galeria-item { position: relative; cursor: pointer; }
     .galeria-item img { width: 120px; height: 120px; object-fit: cover; border-radius: 5px; }
-    .galeria-overlay {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.6); display: flex;
-        justify-content: center; align-items: center; gap: 10px;
-        opacity: 0; transition: opacity 0.3s ease;
-    }
+    .galeria-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; gap: 10px; opacity: 0; transition: opacity 0.3s ease; }
     .galeria-item:hover .galeria-overlay { opacity: 1; }
-    .galeria-overlay button {
-        background: rgba(255, 255, 255, 0.8); color: black;
-        border: none; border-radius: 50%; width: 35px; height: 35px;
-        cursor: pointer; font-size: 1.2em; display: flex;
-        justify-content: center; align-items: center;
-    }
+    .galeria-overlay button { background: rgba(255, 255, 255, 0.8); color: black; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 1.2em; display: flex; justify-content: center; align-items: center; }
     .modal-galeria-actions { margin-top: 20px; text-align: right; }
 </style>
 
@@ -53,6 +33,9 @@ if (typeof galeriaAvataresSetup === 'undefined') {
     const galeriaTitulo = document.getElementById('galeria-titulo');
     const galeriaSubtitulo = document.getElementById('galeria-subtitulo');
     let currentMode = 'usuario';
+
+    const modalVerAvatarEl = document.getElementById('viewAvatarModal');
+    const modalVerAvatar = modalVerAvatarEl ? new bootstrap.Modal(modalVerAvatarEl) : null;
 
     function abrirModalGaleria(idUsuario, mode = 'usuario') {
         currentMode = mode;
@@ -90,9 +73,12 @@ if (typeof galeriaAvataresSetup === 'undefined') {
         const btnVer = document.createElement('button');
         btnVer.innerHTML = '👁️';
         btnVer.title = 'Ver en tamaño completo';
-        btnVer.onclick = () => document.getElementById('avatar-full-image').src = avatar.url_full; // Asume que el modal de vista simple está disponible
-        btnVer.setAttribute('data-bs-toggle', 'modal');
-        btnVer.setAttribute('data-bs-target', '#viewAvatarModal');
+        btnVer.onclick = () => {
+            if(modalVerAvatar) {
+                document.getElementById('avatar-full-image').src = avatar.url_full;
+                modalVerAvatar.show();
+            }
+        };
         overlay.appendChild(btnVer);
 
         if (currentMode === 'usuario') {
@@ -120,8 +106,12 @@ if (typeof galeriaAvataresSetup === 'undefined') {
         formData.append('id_avatar', idAvatar);
         fetch(`${BASE_URL}ajax-handler.php`, { method: 'POST', body: formData })
             .then(res => res.json()).then(data => {
-                if(data.success) window.location.reload();
-                else alert('Error: ' + data.message);
+                if(data.success) {
+                    alert('Avatar seleccionado. La página se recargará.');
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
             });
     }
 
@@ -133,8 +123,11 @@ if (typeof galeriaAvataresSetup === 'undefined') {
         formData.append('id_avatar', idAvatar);
         fetch(`${BASE_URL}ajax-handler.php`, { method: 'POST', body: formData })
             .then(res => res.json()).then(data => {
-                if (data.success) element.remove();
-                else alert('Error: ' + data.message);
+                if (data.success) {
+                    element.remove();
+                } else {
+                    alert('Error: ' + data.message);
+                }
             });
     }
     

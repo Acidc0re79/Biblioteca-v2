@@ -17,8 +17,8 @@
       </div>
     </form>
     <div class="modal-actions">
-      <button onclick="cerrarModalInsignias()">Cancelar</button>
-      <button id="btn-guardar-insignias">Guardar Cambios</button>
+      <button onclick="cerrarModalInsignias()" type="button">Cancelar</button>
+      <button id="btn-guardar-insignias" type="button">Guardar Cambios</button>
     </div>
   </div>
 </div>
@@ -30,7 +30,7 @@
     .insignia-item:hover { background-color: #3a3a3a; }
     .insignia-item input[type="checkbox"] { margin-right: 10px; transform: scale(1.2); }
     .insignia-item img { width: 40px; height: 40px; margin-right: 10px; border-radius: 50%; background: #2c2c2d; padding: 2px; }
-    .insignia-item label { color: #e0e0e0; cursor: pointer; }
+    .insignia-item label { color: #e0e0e0; cursor: pointer; flex-grow: 1; }
     .insignia-item-actions { margin-left: auto; }
     .insignia-item-actions button { background: none; border: none; color: #ccc; cursor: pointer; font-size: 1em; padding: 5px; }
 </style>
@@ -39,11 +39,13 @@
 if (typeof modalInsigniasSetup === 'undefined') {
     const modalInsigniasSetup = true;
     const modalInsignias = document.getElementById('modal-gestionar-insignias');
-    const modalVerInsignia = document.getElementById('viewInsigniaModal');
     const listaObtenidas = document.getElementById('insignias-obtenidas');
     const listaALograr = document.getElementById('insignias-a-lograr');
     const btnGuardar = document.getElementById('btn-guardar-insignias');
     let currentUserId = null;
+
+    const modalVerInsigniaEl = document.getElementById('viewInsigniaModal');
+    const modalVerInsignia = modalVerInsigniaEl ? new bootstrap.Modal(modalVerInsigniaEl) : null;
 
     function abrirModalInsignias(idUsuario) {
         currentUserId = idUsuario;
@@ -62,20 +64,14 @@ if (typeof modalInsigniasSetup === 'undefined') {
                         return;
                     }
                     data.insignias.forEach(insignia => {
-                        // Preparamos los datos de la insignia para la función del ojo
-                        const insigniaData = JSON.stringify({
-                            nombre: insignia.nombre,
-                            descripcion: insignia.descripcion,
-                            imagen_full: insignia.imagen_full
-                        }).replace(/"/g, "'");
-
                         const itemHTML = `
                             <div class="insignia-item">
                                 <input type="checkbox" id="insignia-${insignia.id_insignia}" name="insignias_ids[]" value="${insignia.id_insignia}" ${insignia.tiene_insignia ? 'checked' : ''}>
                                 <img src="${insignia.imagen_thumb}" alt="${insignia.nombre}">
                                 <label for="insignia-${insignia.id_insignia}">${insignia.nombre}</label>
                                 <div class="insignia-item-actions">
-                                    <button onclick="verInsigniaDetalle(${insigniaData})" type="button" title="Ver Detalles">
+                                    <button type="button" title="Ver Detalles"
+                                            onclick="verInsigniaDetalle('${insignia.nombre}', '${insignia.descripcion}', '${insignia.imagen_full}')">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
@@ -94,28 +90,12 @@ if (typeof modalInsigniasSetup === 'undefined') {
             });
     }
     
-    function verInsigniaDetalle(insignia) {
-        if (modalVerInsignia) {
-            document.getElementById('insignia-modal-nombre').textContent = insignia.nombre;
-            document.getElementById('insignia-modal-imagen').src = insignia.imagen_full;
-            document.getElementById('insignia-modal-descripcion').textContent = insignia.descripcion;
-            
-            // Lógica para mostrar el modal de Bootstrap (si está disponible) o un modal simple
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const bootstrapModal = new bootstrap.Modal(modalVerInsignia);
-                bootstrapModal.show();
-            } else {
-                // Fallback si Bootstrap JS no está cargado en el admin
-                modalVerInsignia.style.display = 'block';
-                modalVerInsignia.classList.add('show');
-                // Añadimos un listener para cerrarlo al hacer clic fuera
-                modalVerInsignia.onclick = function(event) {
-                    if (event.target == modalVerInsignia) {
-                        modalVerInsignia.style.display = "none";
-                        modalVerInsignia.classList.remove('show');
-                    }
-                }
-            }
+    function verInsigniaDetalle(nombre, descripcion, url_imagen) {
+        if(modalVerInsignia) {
+            document.getElementById('insignia-modal-nombre').textContent = nombre;
+            document.getElementById('insignia-modal-imagen').src = url_imagen;
+            document.getElementById('insignia-modal-descripcion').textContent = descripcion;
+            modalVerInsignia.show();
         }
     }
 
@@ -124,7 +104,6 @@ if (typeof modalInsigniasSetup === 'undefined') {
     }
 
     btnGuardar.addEventListener('click', () => {
-        const form = document.getElementById('form-insignias');
         const formData = new FormData();
         formData.append('action', 'update_user_badges_admin');
         formData.append('id_usuario', currentUserId);
